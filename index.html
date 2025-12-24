@@ -278,12 +278,12 @@
             <div class="nav-legend">
                 <div class="legend-item"><span class="dot" style="background:var(--primary-color)"></span> ทำอยู่</div>
                 <div class="legend-item"><span class="dot" style="background:var(--success-color)"></span> ทำแล้ว</div>
-                <div class="legend-item"><span class="dot" style="background:var(--warning-color)"></span> ไม่แน่ใจ</div>
+                <div class="legend-item"><span class="dot" style="background:var(--warning-color)"></span> ยังไม่แน่ใจ</div>
                 <div class="legend-item"><span class="dot" style="background:#fff"></span> ว่าง</div>
             </div>
 
             <div style="margin-top: 20px;">
-                <button onclick="finishQuizConfirmation()" style="padding: 12px; font-size: 1rem;">ส่งคำตอบ ✅</button>
+                <button onclick="finishQuizConfirmation()" style="padding: 12px; font-size: 1rem;">ส่งกระดาษคำตอบ ✅</button>
             </div>
         </div>
 
@@ -345,7 +345,7 @@
 
             <!-- 3. RESULT SCREEN -->
             <div id="result-screen" class="screen">
-                <h1 style="text-align: center;">📊 ผลการสอบ</h1>
+                <h1 style="text-align: center;">📊 ผลการทดสอบ</h1>
                 <div id="loading-save" style="display:none; text-align: center; color: orange; margin-bottom: 10px;">กำลังบันทึกข้อมูล...</div>
                 <div id="main-result" style="text-align: center; font-size: 2.5rem; margin: 20px 0; font-weight: bold;"></div>
                 
@@ -373,7 +373,7 @@
 
             <!-- 4. ANSWER KEY SCREEN -->
             <div id="answer-screen" class="screen">
-                <h2 style="text-align: center; color: var(--primary-color);">เฉลยคำตอบ</h2>
+                <h2 style="text-align: center; color: var(--primary-color);">ดูเฉลยคำตอบ</h2>
                 <div id="answer-list"></div>
                 <button onclick="location.reload()" class="secondary" style="position: sticky; bottom: 20px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1);">กลับไปหน้าแรก</button>
             </div>
@@ -1191,6 +1191,7 @@
 </body>
 
 </html>
+
 
 
 
