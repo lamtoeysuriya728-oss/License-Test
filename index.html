@@ -259,6 +259,25 @@
             margin-bottom: 15px;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        /* --- เพิ่ม CSS แถบข่าวด่วน --- */
+        body { padding-bottom: 50px; } /* ดันเนื้อหาขึ้นหนีแถบข่าว */
+
+        .breaking-news-footer {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background-color: #cc0000; color: #ffffff;
+            overflow: hidden; white-space: nowrap;
+            padding: 8px 0; z-index: 99999;
+            font-weight: bold; font-size: 16px;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.3);
+        }
+        .news-scroller {
+            display: inline-block; padding-left: 100%;
+            animation: scroll-left 25s linear infinite;
+        }
+        @keyframes scroll-left {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
     </style>
 </head>
 <body>
@@ -878,22 +897,35 @@
         );
 
         // 2. Validate Login
-        function validateLogin() {
-            const name = document.getElementById('fullname').value.trim();
-            const position = document.getElementById('position').value;
-            const divInput = parseInt(document.getElementById('division').value);
+function validateLogin() {
+            var nameField = document.getElementById('fullname');
+            var posField = document.getElementById('position');
+            var divField = document.getElementById('division');
+            
+            var nameInput = nameField.value.trim();
+            var divInput = parseInt(divField.value);
 
-            if (!name || !position) {
-                alert("กรุณากรอกชื่อและเลือกตำแหน่ง");
+            // 1. ตรวจว่ากรอกครบไหม
+            if (!nameInput || !posField.value || !divField.value) {
+                alert("กรุณากรอกข้อมูลให้ครบถ้วน");
                 return;
             }
 
+            // 2. ตรวจชื่อ-นามสกุล (ต้องมีเว้นวรรค)
+            var nameParts = nameInput.split(/\s+/);
+            if (nameParts.length < 2) {
+                alert("⚠️ กรุณากรอก 'ชื่อ' และ 'นามสกุล' ให้ครบถ้วน");
+                return;
+            }
+
+            // 3. ตรวจสังกัดฝ่าย
             if (!allowedDivisions.includes(divInput)) {
-                alert("กรุณาตอบสังกัดฝ่ายที่ถูกต้องเป็นตัวเลขเท่านั้น ");
+                alert("⛔ รหัสสังกัดฝ่ายไม่ถูกต้อง (เฉพาะสังกัดฝ่ายในโซนเท่านั้น)");
                 return;
             }
 
-            userInfo = { name, position, division: divInput };
+            // ผ่าน! บันทึกและเริ่มสอบ
+            userInfo = { name: nameInput, position: posField.value, division: divInput };
             startQuiz();
         }
 
@@ -1185,7 +1217,25 @@
                 `;
                 list.appendChild(item);
             });
+        } // <- นี่คือปีกกาปิดของ checkResumeExam ตัวเดิม
+
+        // --- ฟังก์ชันปุ่มยกเลิก (วางตรงนี้ทำงานได้ชัวร์ 100%) ---
+        function resetExam() {
+            if(confirm('ต้องการยกเลิกการสอบและกลับไปหน้าแรกใช่หรือไม่?\n(ข้อมูลที่ทำค้างไว้จะถูกลบทั้งหมด)')) {
+                localStorage.removeItem(STORAGE_KEY); 
+                location.reload(); 
+            }
         }
-    </script>
+
+        // เริ่มตรวจสอบข้อมูลเก่าทันทีที่เปิดเว็บ
+        checkResumeExam();
+
+    </script> 
+    <div class="breaking-news-footer">
+        <div class="news-scroller">
+            📢 <strong>ประกาศด่วนจากทีมงาน:</strong> ระบบมีการอัปเดตข้อสอบชุดใหม่ (5 ม.ค. 2026) | ขอให้ทุกท่านกด Refresh หน้าจอก่อนทำข้อสอบ | หากพบปัญหาแจ้งไลน์กลุ่มทันทีครับ!
+        </div>
+    </div>
+
 </body>
 </html>
