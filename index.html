@@ -1226,6 +1226,59 @@ function validateLogin() {
                 location.reload(); 
             }
         }
+        // --- ระบบบันทึกกันเน็ตหลุด (Local Storage) ---
+        function saveExamState() {
+            if (!currentQuestions || currentQuestions.length === 0) return;
+            const state = {
+                userAnswers: userAnswers,
+                unsureFlags: unsureFlags,
+                currentIndex: currentIndex,
+                userInfo: userInfo,
+                timeLeft: timeLeft,
+                currentQuestions: currentQuestions,
+                timestamp: new Date().getTime()
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        }
+
+        function checkResumeExam() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                try {
+                    const state = JSON.parse(saved);
+                    // ถ้าข้อมูลเก่าเกิน 1 วัน (24 ชม.) ให้ลบทิ้ง
+                    if (new Date().getTime() - state.timestamp > 86400000) {
+                        localStorage.removeItem(STORAGE_KEY);
+                        return;
+                    }
+
+                    // ถามผู้ใช้ว่าจะกู้คืนไหม
+                    if (confirm('⚠️ พบข้อมูลการสอบที่ทำค้างไว้! \nต้องการกลับไปทำต่อจากเดิมหรือไม่?')) {
+                        userAnswers = state.userAnswers || {};
+                        unsureFlags = state.unsureFlags || {};
+                        currentIndex = state.currentIndex || 0;
+                        userInfo = state.userInfo || {};
+                        timeLeft = state.timeLeft || (2 * 60 * 60);
+                        currentQuestions = state.currentQuestions || [];
+
+                        // ข้ามหน้า Login ไปหน้าสอบเลย
+                        document.getElementById('loading-overlay').style.display = 'none';
+                        document.getElementById('login-screen').classList.remove('active');
+                        document.getElementById('quiz-screen').classList.add('active');
+                        document.getElementById('quiz-sidebar').style.display = 'flex';
+
+                        startTimer();
+                        renderSidebar();
+                        renderQuestion();
+                    } else {
+                        localStorage.removeItem(STORAGE_KEY); // ถ้าตอบ No ก็ลบทิ้ง
+                    }
+                } catch (e) {
+                    console.error("Resume Error", e);
+                    localStorage.removeItem(STORAGE_KEY);
+                }
+            }
+        }
 
         // เริ่มตรวจสอบข้อมูลเก่าทันทีที่เปิดเว็บ
         checkResumeExam();
@@ -1239,3 +1292,4 @@ function validateLogin() {
 
 </body>
 </html>
+
