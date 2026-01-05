@@ -259,25 +259,6 @@
             margin-bottom: 15px;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        /* --- เพิ่ม CSS แถบข่าวด่วน --- */
-        body { padding-bottom: 50px; } /* ดันเนื้อหาขึ้นหนีแถบข่าว */
-
-        .breaking-news-footer {
-            position: fixed; bottom: 0; left: 0; width: 100%;
-            background-color: #cc0000; color: #ffffff;
-            overflow: hidden; white-space: nowrap;
-            padding: 8px 0; z-index: 99999;
-            font-weight: bold; font-size: 16px;
-            box-shadow: 0 -2px 5px rgba(0,0,0,0.3);
-        }
-        .news-scroller {
-            display: inline-block; padding-left: 100%;
-            animation: scroll-left 25s linear infinite;
-        }
-        @keyframes scroll-left {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-100%); }
-        }
     </style>
 </head>
 <body>
@@ -897,35 +878,22 @@
         );
 
         // 2. Validate Login
-function validateLogin() {
-            var nameField = document.getElementById('fullname');
-            var posField = document.getElementById('position');
-            var divField = document.getElementById('division');
-            
-            var nameInput = nameField.value.trim();
-            var divInput = parseInt(divField.value);
+        function validateLogin() {
+            const name = document.getElementById('fullname').value.trim();
+            const position = document.getElementById('position').value;
+            const divInput = parseInt(document.getElementById('division').value);
 
-            // 1. ตรวจว่ากรอกครบไหม
-            if (!nameInput || !posField.value || !divField.value) {
-                alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+            if (!name || !position) {
+                alert("กรุณากรอกชื่อและเลือกตำแหน่ง");
                 return;
             }
 
-            // 2. ตรวจชื่อ-นามสกุล (ต้องมีเว้นวรรค)
-            var nameParts = nameInput.split(/\s+/);
-            if (nameParts.length < 2) {
-                alert("⚠️ กรุณากรอก 'ชื่อ' และ 'นามสกุล' ให้ครบถ้วน");
-                return;
-            }
-
-            // 3. ตรวจสังกัดฝ่าย
             if (!allowedDivisions.includes(divInput)) {
-                alert("⛔ รหัสสังกัดฝ่ายไม่ถูกต้อง (เฉพาะสังกัดฝ่ายในโซนเท่านั้น)");
+                alert("กรุณาตอบสังกัดฝ่ายที่ถูกต้องเป็นตัวเลขเท่านั้น ");
                 return;
             }
 
-            // ผ่าน! บันทึกและเริ่มสอบ
-            userInfo = { name: nameInput, position: posField.value, division: divInput };
+            userInfo = { name, position, division: divInput };
             startQuiz();
         }
 
@@ -1059,7 +1027,6 @@ function validateLogin() {
         }
 
         function selectAnswer(choiceIndex) {
-            saveExamState();
             userAnswers[currentIndex] = choiceIndex;
             // Note: We do NOT auto-advance to keep user in control
             renderQuestion(); 
@@ -1218,136 +1185,7 @@ function validateLogin() {
                 `;
                 list.appendChild(item);
             });
-        } // <- นี่คือปีกกาปิดของ checkResumeExam ตัวเดิม
-
-        // --- ระบบบันทึกกันเน็ตหลุด (Local Storage) ---
-        function saveExamState() {
-            // เช็คว่ามีคำถามโหลดมาหรือยัง
-            if (!currentQuestions || currentQuestions.length === 0) return;
-            
-            const state = {
-                userAnswers: userAnswers,
-                unsureFlags: unsureFlags,
-                currentIndex: currentIndex,
-                userInfo: userInfo,
-                timeLeft: timeLeft,
-                currentQuestions: currentQuestions,
-                timestamp: new Date().getTime()
-            };
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
         }
-
-        function checkResumeExam() {
-            const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) {
-                try {
-                    const state = JSON.parse(saved);
-                    // ถ้าข้อมูลเก่าเกิน 1 วัน (24 ชม.) ให้ลบทิ้ง
-                    if (new Date().getTime() - state.timestamp > 86400000) {
-                        localStorage.removeItem(STORAGE_KEY);
-                        return;
-                    }
-
-                    // ถามผู้ใช้ว่าจะกู้คืนไหม
-                    if (confirm('⚠️ พบข้อมูลการสอบที่ทำค้างไว้! \nต้องการกลับไปทำต่อจากเดิมหรือไม่?')) {
-                        userAnswers = state.userAnswers || {};
-                        unsureFlags = state.unsureFlags || {};
-                        currentIndex = state.currentIndex || 0;
-                        userInfo = state.userInfo || {};
-                        timeLeft = state.timeLeft || (2 * 60 * 60);
-                        currentQuestions = state.currentQuestions || [];
-
-                        // ข้ามหน้า Login ไปหน้าสอบเลย
-                        document.getElementById('loading-overlay').style.display = 'none';
-                        document.getElementById('login-screen').classList.remove('active');
-                        document.getElementById('quiz-screen').classList.add('active');
-                        document.getElementById('quiz-sidebar').style.display = 'flex';
-
-                        startTimer();
-                        renderSidebar();
-                        renderQuestion();
-                    } else {
-                        localStorage.removeItem(STORAGE_KEY); // ถ้าตอบ No ก็ลบทิ้ง
-                    }
-                } catch (e) {
-                    console.error("Resume Error", e);
-                    localStorage.removeItem(STORAGE_KEY);
-                }
-            }
-        }
-
-        function resetExam() {
-            if(confirm('ต้องการยกเลิกการสอบและกลับไปหน้าแรกใช่หรือไม่?\n(ข้อมูลที่ทำค้างไว้จะถูกลบทั้งหมด)')) {
-                localStorage.removeItem(STORAGE_KEY); 
-                location.reload(); 
-            }
-        }
-        // --- ระบบบันทึกกันเน็ตหลุด (Local Storage) ---
-        function saveExamState() {
-            if (!currentQuestions || currentQuestions.length === 0) return;
-            const state = {
-                userAnswers: userAnswers,
-                unsureFlags: unsureFlags,
-                currentIndex: currentIndex,
-                userInfo: userInfo,
-                timeLeft: timeLeft,
-                currentQuestions: currentQuestions,
-                timestamp: new Date().getTime()
-            };
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-        }
-
-        function checkResumeExam() {
-            const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) {
-                try {
-                    const state = JSON.parse(saved);
-                    // ถ้าข้อมูลเก่าเกิน 1 วัน (24 ชม.) ให้ลบทิ้ง
-                    if (new Date().getTime() - state.timestamp > 86400000) {
-                        localStorage.removeItem(STORAGE_KEY);
-                        return;
-                    }
-
-                    // ถามผู้ใช้ว่าจะกู้คืนไหม
-                    if (confirm('⚠️ พบข้อมูลการสอบที่ทำค้างไว้! \nต้องการกลับไปทำต่อจากเดิมหรือไม่?')) {
-                        userAnswers = state.userAnswers || {};
-                        unsureFlags = state.unsureFlags || {};
-                        currentIndex = state.currentIndex || 0;
-                        userInfo = state.userInfo || {};
-                        timeLeft = state.timeLeft || (2 * 60 * 60);
-                        currentQuestions = state.currentQuestions || [];
-
-                        // ข้ามหน้า Login ไปหน้าสอบเลย
-                        document.getElementById('loading-overlay').style.display = 'none';
-                        document.getElementById('login-screen').classList.remove('active');
-                        document.getElementById('quiz-screen').classList.add('active');
-                        document.getElementById('quiz-sidebar').style.display = 'flex';
-
-                        startTimer();
-                        renderSidebar();
-                        renderQuestion();
-                    } else {
-                        localStorage.removeItem(STORAGE_KEY); // ถ้าตอบ No ก็ลบทิ้ง
-                    }
-                } catch (e) {
-                    console.error("Resume Error", e);
-                    localStorage.removeItem(STORAGE_KEY);
-                }
-            }
-        }
-
-        // เริ่มตรวจสอบข้อมูลเก่าทันทีที่เปิดเว็บ
-        checkResumeExam();
-
-    </script> 
-    <div class="breaking-news-footer">
-        <div class="news-scroller">
-            📢 <strong>ประกาศด่วนจากทีมงาน:</strong> ระบบมีการอัปเดตข้อสอบชุดใหม่ (5 ม.ค. 2026) | ขอให้ทุกท่านกด Refresh หน้าจอก่อนทำข้อสอบ | หากพบปัญหาแจ้งไลน์กลุ่มทันทีครับ!
-        </div>
-    </div>
-
+    </script>
 </body>
 </html>
-
-
-
