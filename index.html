@@ -538,16 +538,6 @@
             userInfo = { name: nameInput, position, division: divInput };
             startQuiz();
         }
-            }
-
-            if (!allowedDivisions.includes(divInput)) {
-                alert("กรุณาตอบสังกัดฝ่ายที่ถูกต้องเป็นตัวเลขเท่านั้น ");
-                return;
-            }
-
-            userInfo = { name, position, division: divInput };
-            startQuiz();
-        }
 
         // 3. Start Quiz
         function startQuiz() {
@@ -904,6 +894,7 @@
 </body>
 
 </html>
+
 
 
 
