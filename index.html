@@ -498,47 +498,50 @@
 
         // 2. Validate Login
         function validateLogin() {
-            function validateLogin() {
-            const nameInput = document.getElementById('fullname').value.trim();
-            const position = document.getElementById('position').value;
-            const divInput = parseInt(document.getElementById('division').value);
+            // รับค่าจากหน้าจอ
+            var nameField = document.getElementById('fullname');
+            var posField = document.getElementById('position');
+            var divField = document.getElementById('division');
+            
+            var nameInput = nameField.value.trim();
+            var position = posField.value;
+            var divInput = parseInt(divField.value);
 
             // 1. ตรวจว่ากรอกครบไหม
-            if (!nameInput || !position) {
+            if (!nameInput || !position || !divField.value) {
                 alert("กรุณากรอกข้อมูลให้ครบถ้วน");
                 return;
             }
 
-            // 2. ตรวจรูปแบบชื่อ-นามสกุล (ต้องมีเว้นวรรค และยาวพอสมควร)
-            const nameParts = nameInput.split(/\s+/); // ตัดคำด้วยช่องว่าง
+            // 2. ตรวจรูปแบบชื่อ-นามสกุล (ต้องมีเว้นวรรค)
+            var nameParts = nameInput.split(/\s+/); // ตัดคำด้วยช่องว่าง
             if (nameParts.length < 2) {
                 alert("⚠️ กรุณากรอก 'ชื่อ' และ 'นามสกุล' ให้ครบถ้วน\n(ต้องมีเว้นวรรคระหว่างชื่อและนามสกุล)");
                 return;
             }
 
             if (nameParts[0].length < 2 || nameParts[1].length < 2) {
-                alert("⚠️ ชื่อหรือนามสกุลสั้นเกินไป กรุณาตรวจสอบความถูกต้อง");
+                alert("⚠️ ชื่อหรือนามสกุลสั้นเกินไป");
                 return;
             }
 
-            // 3. (เสริม) ตรวจว่าไม่มีตัวเลขหรือสัญลักษณ์แปลกๆ
-            const invalidChars = /[^ก-๙a-zA-Z\s]/; // ยอมรับแค่ ภาษาไทย, อังกฤษ, ช่องว่าง
+            // 3. ตรวจอักษรต้องห้าม (กันคนพิมพ์มั่ว)
+            var invalidChars = /[^ก-๙a-zA-Z\s.]/; 
             if (invalidChars.test(nameInput)) {
-                alert("⚠️ ชื่อ-นามสกุล ไม่ควรมีตัวเลขหรือสัญลักษณ์พิเศษ");
+                alert("⚠️ ชื่อ-นามสกุล ต้องเป็นภาษาไทยหรืออังกฤษเท่านั้น");
                 return;
             }
 
-            // 4. ตรวจสังกัดฝ่าย (เหมือนเดิม)
+            // 4. ตรวจสังกัดฝ่าย
             if (!allowedDivisions.includes(divInput)) {
-                alert("⛔ รหัสสังกัดฝ่ายไม่ถูกต้อง หรือไม่อยู่ในโซนที่ได้รับอนุญาต");
+                alert("⛔ รหัสสังกัดฝ่ายไม่ถูกต้อง (เฉพาะสังกัดฝ่ายในโซนเท่านั้น)");
                 return;
             }
 
-            // ผ่านทุกด่าน -> เริ่มสอบ
-            userInfo = { name: nameInput, position, division: divInput };
+            // ผ่านทุกด่าน -> บันทึกค่าและเริ่มสอบ
+            userInfo = { name: nameInput, position: position, division: divInput };
             startQuiz();
         }
-
         // 3. Start Quiz
         function startQuiz() {
             // Show Loading
@@ -894,6 +897,7 @@
 </body>
 
 </html>
+
 
 
 
