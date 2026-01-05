@@ -1059,6 +1059,7 @@ function validateLogin() {
         }
 
         function selectAnswer(choiceIndex) {
+            saveExamState();
             userAnswers[currentIndex] = choiceIndex;
             // Note: We do NOT auto-advance to keep user in control
             renderQuestion(); 
@@ -1292,4 +1293,5 @@ function validateLogin() {
 
 </body>
 </html>
+
 
