@@ -645,6 +645,7 @@
         }
 
         function selectAnswer(choiceIndex) {
+            saveExamState();
             userAnswers[currentIndex] = choiceIndex;
             // Note: We do NOT auto-advance to keep user in control
             renderQuestion(); 
@@ -655,6 +656,7 @@
                 delete unsureFlags[currentIndex];
             } else {
                 unsureFlags[currentIndex] = true;
+                saveExamState();
             }
             renderQuestion(); 
         }
@@ -686,7 +688,7 @@
         // 6. Calculate Results
         function finishQuiz() {
             clearInterval(timerInterval);
-            
+            localStorage.removeItem(STORAGE_KEY);
             // UI Switch
             document.getElementById('loading-overlay').style.display = 'flex';
             document.getElementById('loading-text').innerText = 'กำลังคำนวณคะแนน...';
@@ -804,10 +806,65 @@
                 list.appendChild(item);
             });
         }
+    // --- ระบบบันทึกกันเน็ตหลุด (Local Storage) ---
+        function saveExamState() {
+            if (!currentQuestions || currentQuestions.length === 0) return;
+            const state = {
+                userAnswers: userAnswers,
+                unsureFlags: unsureFlags,
+                currentIndex: currentIndex,
+                userInfo: userInfo,
+                timeLeft: timeLeft,
+                currentQuestions: currentQuestions,
+                timestamp: new Date().getTime()
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        }
+
+        function checkResumeExam() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                try {
+                    const state = JSON.parse(saved);
+                    // ถ้าข้อมูลเก่าเกิน 1 วัน ให้ลบทิ้ง
+                    if (new Date().getTime() - state.timestamp > 86400000) {
+                        localStorage.removeItem(STORAGE_KEY);
+                        return;
+                    }
+
+                    if (confirm('⚠️ พบข้อมูลการสอบที่ทำค้างไว้! \nต้องการกลับไปทำต่อจากเดิมหรือไม่?')) {
+                        userAnswers = state.userAnswers || {};
+                        unsureFlags = state.unsureFlags || {};
+                        currentIndex = state.currentIndex || 0;
+                        userInfo = state.userInfo || {};
+                        timeLeft = state.timeLeft || (2 * 60 * 60);
+                        currentQuestions = state.currentQuestions || [];
+
+                        // ข้ามหน้า Login ไปหน้าสอบเลย
+                        document.getElementById('loading-overlay').style.display = 'none';
+                        document.getElementById('login-screen').classList.remove('active');
+                        document.getElementById('quiz-screen').classList.add('active');
+                        document.getElementById('quiz-sidebar').style.display = 'flex';
+
+                        startTimer();
+                        renderSidebar();
+                        renderQuestion();
+                    } else {
+                        localStorage.removeItem(STORAGE_KEY);
+                    }
+                } catch (e) {
+                    localStorage.removeItem(STORAGE_KEY);
+                }
+            }
+        }
+        
+        // เริ่มเช็คทันที
+        checkResumeExam();
     </script>
 </body>
 
 </html>
+
 
 
 
