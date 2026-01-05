@@ -699,7 +699,6 @@
             }
         }
 
-        function finishQuizConfirmation() {
             function resetExam() {
             if(confirm('ต้องการยกเลิกการสอบและกลับไปหน้าแรกใช่หรือไม่?\n(ข้อมูลที่ทำค้างไว้จะถูกลบทั้งหมด)')) {
                 localStorage.removeItem(STORAGE_KEY); // ลบข้อมูลกันเน็ตหลุดออก
@@ -903,10 +902,10 @@
             }
         }
 
-        // เริ่มเช็คทันที (ต้องอยู่ก่อนปิดสคริปต์)
+// เริ่มเช็คทันที
         checkResumeExam();
-
-    </script> <div class="breaking-news-footer">
+    </script> 
+    <div class="breaking-news-footer">
         <div class="news-scroller">
             📢 <strong>ประกาศด่วนจากทีมงาน:</strong> ระบบมีการอัปเดตข้อสอบชุดใหม่ (5 ม.ค. 2026) | ขอให้ทุกท่านกด Refresh หน้าจอก่อนทำข้อสอบ | หากพบปัญหาแจ้งไลน์กลุ่มทันทีครับ!
         </div>
@@ -914,4 +913,5 @@
 
 </body>
 </html>
+
 
