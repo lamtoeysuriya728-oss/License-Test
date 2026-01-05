@@ -274,6 +274,20 @@
             margin-bottom: 15px;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        /* ลายน้ำจางๆ แสดงความเป็นเจ้าของ */
+        body::before {
+            content: "เรียบเรียงโดย คุณสุภร อนุสุริยา (ลำเต้ย)";
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg); /* เอียง 45 องศา */
+            font-size: 2.5rem; /* ขนาดตัวอักษร */
+            color: rgba(0, 0, 0, 0.08); /* สีจางๆ (เปลี่ยนเลข 0.08 ให้มากลงถ้ายากให้เข้มขึ้น) */
+            pointer-events: none; /* คลิาทะลุได้ ไม่บังปุ่ม */
+            z-index: 9999;
+            white-space: nowrap;
+            user-select: none;
+        }
     </style>
 </head>
 <body>
@@ -408,6 +422,7 @@ let s=typeof globalThis!=='undefined'?globalThis:typeof window!=='undefined'?win
 </body>
 
 </html>
+
 
 
 
