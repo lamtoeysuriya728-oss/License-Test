@@ -299,6 +299,7 @@
 
             <div style="margin-top: 20px;">
                 <button onclick="finishQuizConfirmation()" style="padding: 12px; font-size: 1rem;">ส่งกระดาษคำตอบ ✅</button>
+                <button onclick="resetExam()" style="padding: 12px; font-size: 1rem; background-color: #666; margin-top: 10px;">ยกเลิก / เริ่มใหม่ 🏠</button>
             </div>
         </div>
 
@@ -497,13 +498,46 @@
 
         // 2. Validate Login
         function validateLogin() {
-            const name = document.getElementById('fullname').value.trim();
+            function validateLogin() {
+            const nameInput = document.getElementById('fullname').value.trim();
             const position = document.getElementById('position').value;
             const divInput = parseInt(document.getElementById('division').value);
 
-            if (!name || !position) {
-                alert("กรุณากรอกชื่อและเลือกตำแหน่ง");
+            // 1. ตรวจว่ากรอกครบไหม
+            if (!nameInput || !position) {
+                alert("กรุณากรอกข้อมูลให้ครบถ้วน");
                 return;
+            }
+
+            // 2. ตรวจรูปแบบชื่อ-นามสกุล (ต้องมีเว้นวรรค และยาวพอสมควร)
+            const nameParts = nameInput.split(/\s+/); // ตัดคำด้วยช่องว่าง
+            if (nameParts.length < 2) {
+                alert("⚠️ กรุณากรอก 'ชื่อ' และ 'นามสกุล' ให้ครบถ้วน\n(ต้องมีเว้นวรรคระหว่างชื่อและนามสกุล)");
+                return;
+            }
+
+            if (nameParts[0].length < 2 || nameParts[1].length < 2) {
+                alert("⚠️ ชื่อหรือนามสกุลสั้นเกินไป กรุณาตรวจสอบความถูกต้อง");
+                return;
+            }
+
+            // 3. (เสริม) ตรวจว่าไม่มีตัวเลขหรือสัญลักษณ์แปลกๆ
+            const invalidChars = /[^ก-๙a-zA-Z\s]/; // ยอมรับแค่ ภาษาไทย, อังกฤษ, ช่องว่าง
+            if (invalidChars.test(nameInput)) {
+                alert("⚠️ ชื่อ-นามสกุล ไม่ควรมีตัวเลขหรือสัญลักษณ์พิเศษ");
+                return;
+            }
+
+            // 4. ตรวจสังกัดฝ่าย (เหมือนเดิม)
+            if (!allowedDivisions.includes(divInput)) {
+                alert("⛔ รหัสสังกัดฝ่ายไม่ถูกต้อง หรือไม่อยู่ในโซนที่ได้รับอนุญาต");
+                return;
+            }
+
+            // ผ่านทุกด่าน -> เริ่มสอบ
+            userInfo = { name: nameInput, position, division: divInput };
+            startQuiz();
+        }
             }
 
             if (!allowedDivisions.includes(divInput)) {
@@ -671,6 +705,12 @@
         }
 
         function finishQuizConfirmation() {
+            function resetExam() {
+            if(confirm('ต้องการยกเลิกการสอบและกลับไปหน้าแรกใช่หรือไม่?\n(ข้อมูลที่ทำค้างไว้จะถูกลบทั้งหมด)')) {
+                localStorage.removeItem(STORAGE_KEY); // ลบข้อมูลกันเน็ตหลุดออก
+                location.reload(); // รีโหลดหน้าเว็บใหม่
+            }
+        }
             const answeredCount = Object.keys(userAnswers).length;
             const total = currentQuestions.length;
             
@@ -864,6 +904,7 @@
 </body>
 
 </html>
+
 
 
 
