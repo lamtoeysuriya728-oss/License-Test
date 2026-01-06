@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>แบบทดสอบใบอนุญาตตัวแทนประกันชีวิต 2025 (ฉบับสมบูรณ์)</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
-    <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
@@ -27,6 +26,24 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            /* ดันเนื้อหาขึ้นหนีแถบข่าวด่วนด้านล่าง */
+            padding-bottom: 50px; 
+        }
+        
+        /* ป้องกันการคลุมดำก๊อปปี้ข้อความ */
+        body {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        /* ยกเว้นส่วนที่ต้องการให้พิมพ์หรือกรอกข้อมูลได้ */
+        input, select, textarea {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
         }
 
         /* Layout Container */
@@ -259,6 +276,24 @@
             margin-bottom: 15px;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* --- CSS แถบข่าวด่วน --- */
+        .breaking-news-footer {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background-color: #cc0000; color: #ffffff;
+            overflow: hidden; white-space: nowrap;
+            padding: 8px 0; z-index: 99999;
+            font-weight: bold; font-size: 16px;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.3);
+        }
+        .news-scroller {
+            display: inline-block; padding-left: 100%;
+            animation: scroll-left 25s linear infinite;
+        }
+        @keyframes scroll-left {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
     </style>
 </head>
 <body>
@@ -270,7 +305,6 @@
 
     <div class="main-wrapper">
         
-        <!-- SIDEBAR -->
         <div id="quiz-sidebar" class="quiz-sidebar">
             <h4 style="margin: 0 0 15px 0; text-align: center; font-size: 1.2rem; color: var(--primary-color);">ข้อสอบทั้งหมด</h4>
             <div id="nav-grid" class="nav-grid"></div>
@@ -283,21 +317,20 @@
             </div>
 
             <div style="margin-top: 20px;">
-                <button onclick="finishQuizConfirmation()" style="padding: 12px; font-size: 1rem;">ส่งคำตอบ ✅</button>
+                <button onclick="finishQuizConfirmation()" style="padding: 12px; font-size: 1rem;">ส่งกระดาษคำตอบ ✅</button>
+                <button onclick="resetExam()" style="padding: 12px; font-size: 1rem; background-color: #666; margin-top: 10px;">ยกเลิก / เริ่มใหม่ 🏠</button>
             </div>
         </div>
 
-        <!-- MAIN CONTENT -->
         <div class="content-container">
             <header>
                 <img src="https://img5.pic.in.th/file/secure-sv1/Red-White-Bold-Gladiator-Logo101.md.png" alt="Logo" class="logo">
                 <h2>กลุ่มการตลาด โซน 2</h2>
             </header>
 
-            <!-- 1. LOGIN SCREEN -->
             <div id="login-screen" class="screen active">
-                <h1 style="text-align: center;">📝 ลงทะเบียนเข้าทดสอบ</h1>
-                <p style="text-align: center; color: #666; margin-bottom: 30px;">การทดสอบรับใบอนุญาตตัวแทนประกันชีวิต (ก่อนสอบจริง)</p>
+                <h1 style="text-align: center;">📝 ลงทะเบียนทำแบบทดสอบ</h1>
+                <p style="text-align: center; color: #666; margin-bottom: 30px;">ทดสอบรับใบอนุญาตตัวแทนประกันชีวิต (ก่อนสอบจริง)</p>
                 <div class="form-group">
                     <label>👤 ชื่อ - นามสกุล</label>
                     <input type="text" id="fullname" placeholder="ระบุชื่อจริง นามสกุลจริง">
@@ -315,13 +348,12 @@
                 </div>
                 <div class="form-group">
                     <label>🏢 สังกัดฝ่าย (ตัวเลขเท่านั้น)</label>
-                    <input type="number" id="division" placeholder="กรุณาเป็นตัวเลข">
-                    <small style="color: #888;">(เฉพาะฝ่าย:ที่ได้อนุญาตเท่านั้น)</small>
+                    <input type="number" id="division" placeholder="ระบุเป็นตัวเลข">
+                    <small style="color: #888;">(เฉพาะสังกัดฝ่าย:ในโซนเท่านั้น)</small>
                 </div>
                 <button onclick="validateLogin()">เริ่มทำแบบทดสอบ 🚀</button>
             </div>
 
-            <!-- 2. QUIZ SCREEN -->
             <div id="quiz-screen" class="screen">
                 <div class="question-header">
                     <div>
@@ -343,9 +375,8 @@
                 </div>
             </div>
 
-            <!-- 3. RESULT SCREEN -->
             <div id="result-screen" class="screen">
-                <h1 style="text-align: center;">📊 ผลการสอบ</h1>
+                <h1 style="text-align: center;">📊 ผลการทดสอบ</h1>
                 <div id="loading-save" style="display:none; text-align: center; color: orange; margin-bottom: 10px;">กำลังบันทึกข้อมูล...</div>
                 <div id="main-result" style="text-align: center; font-size: 2.5rem; margin: 20px 0; font-weight: bold;"></div>
                 
@@ -368,30 +399,28 @@
                 </div>
 
                 <button onclick="showAnswers()">📖 ดูเฉลยและคำอธิบาย</button>
-                <button onclick="location.reload()" class="secondary">🔄 สอบใหม่อีกครั้ง</button>
+                <button onclick="resetExam()" class="secondary">🔄 สอบใหม่อีกครั้ง</button>
             </div>
 
-            <!-- 4. ANSWER KEY SCREEN -->
             <div id="answer-screen" class="screen">
-                <h2 style="text-align: center; color: var(--primary-color);">เฉลยคำตอบ</h2>
+                <h2 style="text-align: center; color: var(--primary-color);">ดูเฉลยคำตอบ</h2>
                 <div id="answer-list"></div>
-                <button onclick="location.reload()" class="secondary" style="position: sticky; bottom: 20px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1);">กลับไปหน้าแรก</button>
+                <button onclick="resetExam()" class="secondary" style="position: sticky; bottom: 20px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1);">กลับไปหน้าแรก</button>
             </div>
         </div>
     </div>
 
     <footer>
-        <p>ผู้จัดทำและเรียบเรียงข้อสอบ นายสุภร อนุสุริยา (ลำเต้ย) | ลิขสิทธิ์ 2025</p>
+        <p>ข้อสอบ 400+ ข้อ | อัพเดทวันที่ 23 ธันวาคม 2568 </p>
+        <p>ผู้จัดทำและเรียบเรียงข้อสอบ นายสุภร อนุสุริยา (ลำเต้ย) | ลิขสิทธิ์ 2025 | เวอร์ชั่น 0.2.3(ตัวเต็ม)</p>
     </footer>
 
-    <!-- SCRIPT SECTION -->
     <script>
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxUPA0QrzDpB-yqZajRV2NKpjnfZU9S4DWhb00XlkvqqRSm9K5rpOgzkAriG1VIqP4/exec'; //
-        const allowedDivisions = [4, 6, 23, 24, 42, 71, 81, 82, 103, 111, 118, 121, 127, 130];
+        const GOOGLE_SCRIPT_URL='https://script.google.com/macros/s/AKfycbxUPA0QrzDpB-yqZajRV2NKpjnfZU9S4DWhb00XlkvqqRSm9K5rpOgzkAriG1VIqP4/exec';
+        const allowedDivisions=[4, 6, 23, 24, 42, 71, 81, 82, 103, 111, 118, 121, 127, 130];
+        const STORAGE_KEY = 'license_exam_backup_v1';
 
         // --- RAW DATA STORAGE ---
-        // ใส่ข้อมูลดิบที่นี่เพื่อให้แน่ใจว่าโหลดครบถ้วน
-        
         const rawEthicsText = `
 ข้อที่ 1 นางก. และนางสาวข. เป็นตัวแทนประกันชีวิตบริษัทเดียวกัน นายค. ทำประกันไว้กับนางก. แต่ไม่ได้รับการบริการ ต่อมานางสาวข. ให้บริการนายค เป็นอย่างดี นายค. จึงทำประกันอีกกรมธรรม์กับนางสาวข การกระทำของนางสาวข. ผิดจรรยาบรรณต่อเพื่อนร่วมอาชีพหรือไม่ ก. ผิด เพราะนางสาวข. ได้ประโยชน์จากลูกค้าของตัวแทนคนอื่น ข. ผิด เพราะเป็นการแย่งลูกค้าของตัวแทนในบริษัทเดียวกัน ค. ไม่ผิด เพราะนายค ขอทำประกันกับนางสาวข, เอง ง. ไม่ผิด เพราะมิได้เป็นการแย่งลูกค้า เฉลย: ข. คำอธิบาย: แม้นายค. จะเป็นฝ่ายขอทำประกันเอง แต่การรับทำประกันลูกค้าของตัวแทนคนอื่นในบริษัทเดียวกัน ถือเป็นการแข่งลูกค้า ขัดต่อจรรยาบรรณเพื่อนร่วมอาชีพ
 ข้อที่ 2 นายข. รับเบี้ยประกันจากนายก. แล้วนำไปใช้ส่วนตัว โดยอ้างว่ามีระยะเวลาผ่อนผัน 30 วัน และนำส่งบริษัทภายหลังแต่ไม่เกินระยะเวลาผ่อนผัน การกระทำของนายข. ถูกหรือไม่ ก. ถูก เพราะไม่เกิดผลเสีย ข. ผิด เพราะไม่ซื่อสัตย์ต่อลูกค้าและบริษัท ค. ผิด เพราะควรบอกกล่าวลูกค้าก่อน ง. ไม่มีข้อถูก เฉลย: ข. คำอธิบาย: เบี้ยประกันภัยเป็นเงินของบริษัท ตัวแทนไม่มีสิทธิ์นำไปใช้ส่วนตัว ไม่ว่ากรมธรรม์จะอยู่ในระยะผ่อนผันหรือไม่ ถือเป็นการขาดความซื่อสัตย์อย่างร้ายแรง
@@ -495,7 +524,7 @@
 ข้อที่ 100 เป้าหมายสูงสุดของการยึดถือจรรยาบรรณและศีลธรรมของตัวแทนประกันชีวิตคือข้อใด ก. เพิ่มยอดขาย ข. ลดปัญหา ค. สร้างความเชื่อมั่นและศรัทธาในวิชาชีพ ง. ปฏิบัติตามกฎหมายเท่านั้น เฉลย: ค. คำอธิบาย: จรรยาบรรณไม่ใช่ข้อบังคับธรรมดา แต่คือหัวใจที่ทำให้วิชาชีพนี้ “มีคุณค่า” ต่อสังคม
 `;
 
-        const rawActText = `
+const rawActText = `
 ข้อที่ 1 กฎหมายที่ใช้ควบคุมกิจการประกันชีวิตซึ่งมีผลใช้บังคับอยู่ในขณะนี้คือข้อใด ก. พระราชบัญญัติประกันชีวิต พ.ศ.2535 และที่แก้ไขเพิ่มเติม ข. พระราชบัญญัติประกันชีวิต พ.ศ.2510 ค. พระราชบัญญัติประกันวินาศภัย พ.ศ.2535 แก้ไขเพิ่มเติมโดย พ.ศ.2551 ง. ถูกทั้งข้อ ก. ข. และ ค. เฉลย: ก. คำอธิบาย: กฎหมายหลักที่ใช้ควบคุมธุรกิจประกันชีวิตในปัจจุบันคือ พระราชบัญญัติประกันชีวิต พ.ศ.2535 และที่แก้ไขเพิ่มเติม
 ข้อที่ 2 พระราชบัญญัติประกันชีวิต พ.ศ.2535 และที่แก้ไขเพิ่มเติม เป็นกฎหมายที่ตราขึ้นเพื่อควบคุมเรื่องใด ก. บริษัทที่ได้รับใบอนุญาตให้ประกอบธุรกิจประกันชีวิต ข. สาขาของบริษัทประกันชีวิต ค. ตัวแทนประกันชีวิตและนายหน้าประกันชีวิต ง. ถูกทุกข้อ เฉลย: ง. คำอธิบาย: กฎหมายฉบับนี้ครอบคลุมทั้งบริษัท สาขา ตัวแทน และนายหน้า
 ข้อที่ 3 ผู้รักษาการตามพระราชบัญญัติประกันชีวิต พ.ศ.2535 และที่แก้ไขเพิ่มเติม คือใคร ก. นายทะเบียน ข. คณะกรรมการกำกับและส่งเสริมการประกอบธุรกิจประกันภัย (คปภ.) ค. รัฐมนตรีว่าการกระทรวงพาณิชย์ ง. รัฐมนตรีว่าการกระทรวงการคลัง เฉลย: ง. คำอธิบาย: รัฐมนตรีว่าการกระทรวงการคลังเป็นผู้รักษาการตามกฎหมาย
@@ -598,7 +627,7 @@
 ข้อที่ 100 เป้าหมายสูงสุดของพระราชบัญญัติประกันชีวิต พ.ศ.2535 และที่แก้ไขเพิ่มเติม คือข้อใด ก. เพิ่มจำนวนบริษัท ข. ควบคุมตัวแทน ค. คุ้มครองผู้เอาประกันภัยและระบบประกันชีวิต ง. ส่งเสริมการแข่งขัน เฉลย: ค. คำอธิบาย: เป้าหมายสูงสุดของกฎหมายคือการคุ้มครองผู้เอาประกันภัย
 `;
 
-        const rawGeneralText = `
+const rawGeneralText = `
 ข้อที่ 1 ข้อใดคือความหมายของการประกันชีวิต ก. วิธีการที่คนกลุ่มหนึ่งร่วมกันป้องกันภัยที่จะเกิดขึ้นในอนาคต ข. วิธีการที่คนกลุ่มหนึ่งรวมตัวกันเพื่อช่วยกันเฉลี่ยภัยจากการเสียชีวิต สูญเสียอวัยวะ และทุพพลภาพ ค. วิธีการที่คนกลุ่มหนึ่งรวมตัวกันเพื่อช่วยกันเฉลี่ยภัยทางเศรษฐกิจที่จะเกิดขึ้นในอนาคต ง. วิธีการที่คนกลุ่มหนึ่งรวมตัวกันเพื่อลดความเสี่ยงภัยที่จะเกิดขึ้น เฉลย: ข. คำอธิบาย: การประกันชีวิตเป็นระบบการเฉลี่ยความเสี่ยง
 ข้อที่ 2 การประกันชีวิตแตกต่างจากการประกันวินาศภัยอย่างไร ก. การประกันชีวิตจ่ายตามจำนวนเงินเอาประกัน ส่วนการประกันวินาศภัยจ่ายตามความเสียหายจริงโดยไม่จำกัดจำนวนเงินเอาประกัน ข. การประกันชีวิตจ่ายตามจำนวนเงินเอาประกัน ส่วนการประกันวินาศภัยจ่ายตามความเสียหายจริงแต่ไม่เกินจำนวนเงินเอาประกัน ค. การประกันชีวิตจ่ายตามเบี้ยที่จ่ายไป ส่วนการประกันวินาศภัยจ่ายตามความเสียหายจริง ง. การประกันชีวิตจ่ายตามจำนวนเงินเอาประกัน ส่วนการประกันวินาศภัยจ่ายตามเบี้ยประกัน เฉลย: ข. คำอธิบาย: การประกันชีวิตจ่ายผลประโยชน์ตามทุนประกันที่กำหนดไว้ล่วงหน้า
 ข้อที่ 3 การประกันชีวิตกับการฝากเงินธนาคารเหมือนและแตกต่างกันอย่างไร ก. ออมทรัพย์เหมือนกัน แต่การประกันชีวิตไม่มีสิทธิกู้เงิน ข. ออมทรัพย์เหมือนกัน แต่การประกันชีวิตให้ความคุ้มครองชีวิต ค. การประกันชีวิตไม่มีการออมทรัพย์ แต่การฝากเงินไม่มีความคุ้มครอง ง. ถูกเฉพาะข้อ ก และ ข เฉลย: ง. คำอธิบาย: ทั้งการฝากเงินและการประกันชีวิตมีลักษณะการออมเหมือนกัน
@@ -746,7 +775,7 @@
 ข้อที่ 48 การประกันชีวิตแบบใดมีลักษณะคล้ายการประกันวินาศภัยมากที่สุด ก. แบบตลอดชีพ ข. แบบสะสมทรัพย์ ค. แบบบำนาญ ง. แบบชั่วระยะเวลา เฉลย: ง. คำอธิบาย: คุ้มครองเฉพาะช่วง ไม่มีเงินคืน
 ข้อที่ 49 ผู้เอาประกันทำประกันชีวิตแบบชั่วระยะเวลา 100,000 บาท และซื้อสัญญาเพิ่มเติมอุบัติเหตุ 100,000 บาท หากอยู่ครบสัญญาจะได้รับเงินเท่าใด ก. 100,000 บาท ข. 200,000 บาท ค. 300,000 บาท ง. ไม่ได้รับเงินใดเลย เฉลย: ง. คำอธิบาย: ไม่ได้รับเงินคืน
 ข้อที่ 50 ข้อใดเป็นประโยชน์ของการประกันชีวิตแบบตลอดชีพ ก. ให้ความคุ้มครองตลอดอายุของผู้เอาประกัน ข. มีมูลค่าเงินสดและสามารถกู้เงินได้ ค. ใช้เป็นหลักประกันทางการเงินให้ครอบครัว ง. ถูกทุกข้อ เฉลย: ง. คำอธิบาย: ประโยชน์หลายด้าน
-ข้อที่ 51 การประกันชีวิตแบบสะสมทรัพย์เป็นการนำการประกันชีวิตแบบใดมารวมกัน ก. แบบตลอดชีพ และ แบบบำนาญ ข. แบบชั่วระยะเวลา และ แบบตลอดชีพ ค. แบบชั่วระยะเวลา และ แบบบำนาญ ง. แบบตลอดชีพ และ แบบเงินได้ประจำ เฉลย: ค. คำอธิบาย: จริงๆ คือ ชั่วระยะเวลา + สะสมทรัพย์แท้จริง (แต่ในตัวเลือกมักเป็น ชั่วระยะเวลา + ตลอดชีพ หรือออมทรัพย์) *แก้ไขตามเฉลยไฟล์: เฉลย ค. คือ ชั่วระยะเวลา + บำนาญ? ไม่น่าใช่ ปกติคือ ชั่วระยะเวลา + สะสมทรัพย์แท้จริง (Pure Endowment) หรือ ชั่วระยะเวลา + การออม. ตามไฟล์แนบเฉลย ค. (ชั่วระยะเวลา และ แบบบำนาญ?? น่าจะพิมพ์ผิดในไฟล์ หรือเฉลยผิดในไฟล์ แต่เราต้องยึดตามไฟล์: เฉลย ค.)
+ข้อที่ 51 การประกันชีวิตแบบสะสมทรัพย์เป็นการนำการประกันชีวิตแบบใดมารวมกัน ก. แบบตลอดชีพ และ แบบบำนาญ ข. แบบชั่วระยะเวลา และ แบบตลอดชีพ ค. แบบชั่วระยะเวลา และ แบบบำนาญ ง. แบบตลอดชีพ และ แบบเงินได้ประจำ เฉลย: ค. คำอธิบาย: ผสมระหว่างชั่วระยะเวลาและการออม
 ข้อที่ 52 การประกันชีวิตแบบใดที่บริษัทจะจ่ายเงินเอาประกัน เมื่อผู้เอาประกันเสียชีวิตก่อนครบสัญญา หรือมีชีวิตอยู่จนครบสัญญา ก. แบบตลอดชีพ ข. แบบชั่วระยะเวลา ค. แบบสะสมทรัพย์ ง. แบบบำนาญ เฉลย: ค. คำอธิบาย: สะสมทรัพย์จ่ายทั้งสองกรณี
 ข้อที่ 53 ผู้ที่ต้องการรายได้ที่แน่นอนในวัยชราและไม่เป็นภาระแก่ครอบครัว ควรทำประกันชีวิตแบบใด ก. แบบตลอดชีพ ข. แบบชั่วระยะเวลา ค. แบบสะสมทรัพย์ ง. แบบเงินได้ประจำ (บำนาญ) เฉลย: ง. คำอธิบาย: บำนาญ
 ข้อที่ 54 ผู้เอาประกันภัยที่มีอาชีพเสี่ยงและมีโรคประจำตัว บริษัทจะพิจารณาเบี้ยประกันอย่างไร ก. เรียกเก็บเบี้ยประกันชีวิตเท่านั้น ข. เรียกเก็บเบี้ยประกันชีวิตและเบี้ยอุบัติเหตุ ค. เรียกเก็บเบี้ยประกันชีวิตและเบี้ยเพิ่มจากสุขภาพ ง. เรียกเก็บเบี้ยประกันชีวิต เบี้ยอุบัติเหตุ และเบี้ยเพิ่มจากอาชีพและสุขภาพ เฉลย: ง. คำอธิบาย: เพิ่มเบี้ยทั้งอาชีพและสุขภาพ
@@ -795,43 +824,30 @@
         // --- IMPROVED DATA PARSER ---
         function parseRawData(text) {
             const questions = [];
-            // Normalize spaces and split by question number
-            // Regex handles "ข้อที่ 1", "ข้อที่1", "ข้อที่  1", etc.
-            // Also handles potential newlines between "ข้อที่" and number
             const parts = text.split(/(?:\n|^)\s*ข้อที่\s*\d+\s*/);
             
-            // First part is usually empty or header garbage, skip it
             for (let i = 1; i < parts.length; i++) {
                 let chunk = parts[i].trim();
-                
-                // Cleanup potentially messy headers from PDF copy paste (e.g. --- PAGE 2 ---)
                 chunk = chunk.replace(/--- PAGE \d+ ---/g, "");
 
-                // Basic parsing logic
-                // Find Answer Key "เฉลย:"
                 let ansMatch = chunk.match(/เฉลย:\s*([กขคง])/);
-                if (!ansMatch) continue; // Skip bad chunks
+                if (!ansMatch) continue; 
                 
                 let correctChar = ansMatch[1];
                 let correctIndex = {'ก':0, 'ข':1, 'ค':2, 'ง':3}[correctChar];
 
-                // Find Explanation
                 let expMatch = chunk.match(/คำอธิบาย:\s*([\s\S]*)/);
                 let explanation = expMatch ? expMatch[1].trim() : "-";
 
-                // Extract Question Body (Everything before "เฉลย:")
                 let qBody = chunk.substring(0, ansMatch.index).trim();
 
-                // Find Choices Index
                 let idxG = qBody.lastIndexOf("ก.");
                 let idxK = qBody.lastIndexOf("ข.");
                 let idxKA = qBody.lastIndexOf("ค.");
                 let idxNG = qBody.lastIndexOf("ง.");
 
-                // Validation
                 if (idxG === -1 || idxK === -1 || idxKA === -1 || idxNG === -1) continue;
 
-                // Extract Text
                 let questionText = qBody.substring(0, idxG).trim();
                 let c1 = qBody.substring(idxG+2, idxK).trim();
                 let c2 = qBody.substring(idxK+2, idxKA).trim();
@@ -870,40 +886,48 @@
             code: codeQs.map((q, i) => ({...q, id: 'code_'+i, category: 'code', catName: 'กฎหมายแพ่ง', score: 2}))
         };
 
-        console.log("Loaded Questions:", 
-            "Ethics:", questionPool.ethics.length,
-            "General:", questionPool.general.length,
-            "Act:", questionPool.act.length,
-            "Code:", questionPool.code.length
-        );
-
         // 2. Validate Login
         function validateLogin() {
-            const name = document.getElementById('fullname').value.trim();
+            const nameInput = document.getElementById('fullname').value.trim();
             const position = document.getElementById('position').value;
             const divInput = parseInt(document.getElementById('division').value);
 
-            if (!name || !position) {
-                alert("กรุณากรอกชื่อและเลือกตำแหน่ง");
+            if (!nameInput || !position) {
+                alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+                return;
+            }
+
+            const nameParts = nameInput.split(/\s+/);
+            if (nameParts.length < 2) {
+                alert("⚠️ กรุณากรอก 'ชื่อ' และ 'นามสกุล' ให้ครบถ้วน\n(ต้องมีเว้นวรรคระหว่างชื่อและนามสกุล)");
+                return;
+            }
+
+            if (nameParts[0].length < 2 || nameParts[1].length < 2) {
+                alert("⚠️ ชื่อหรือนามสกุลสั้นเกินไป");
+                return;
+            }
+
+            const invalidChars = /[^ก-๙a-zA-Z\s.]/; 
+            if (invalidChars.test(nameInput)) {
+                alert("⚠️ ชื่อ-นามสกุล ต้องเป็นภาษาไทยหรืออังกฤษเท่านั้น");
                 return;
             }
 
             if (!allowedDivisions.includes(divInput)) {
-                alert("กรุณาตอบสังกัดฝ่ายที่ถูกต้องเป็นตัวเลขเท่านั้น ");
+                alert("⛔ รหัสสังกัดฝ่ายไม่ถูกต้อง (เฉพาะสังกัดฝ่ายในโซนเท่านั้น)");
                 return;
             }
 
-            userInfo = { name, position, division: divInput };
+            userInfo = { name: nameInput, position: position, division: divInput };
             startQuiz();
         }
 
         // 3. Start Quiz
         function startQuiz() {
-            // Show Loading
             document.getElementById('loading-overlay').style.display = 'flex';
 
             setTimeout(() => {
-                // Randomize
                 const ethicsSubset = shuffle(questionPool.ethics).slice(0, 20);
                 const generalSubset = shuffle(questionPool.general).slice(0, 20);
                 const actSubset = shuffle(questionPool.act).slice(0, 10);
@@ -921,12 +945,10 @@
                     return;
                 }
 
-                // Reset States
                 userAnswers = {};
                 unsureFlags = {};
                 currentIndex = 0;
 
-                // UI Switch
                 document.getElementById('loading-overlay').style.display = 'none';
                 document.getElementById('login-screen').classList.remove('active');
                 document.getElementById('quiz-screen').classList.add('active');
@@ -935,7 +957,7 @@
                 startTimer();
                 renderSidebar(); 
                 renderQuestion();
-            }, 500); // Fake loading delay for UX
+            }, 500); 
         }
 
         function shuffle(array) {
@@ -977,7 +999,6 @@
                 btn.className = 'nav-btn';
                 btn.innerText = idx + 1;
                 
-                // Priority of states: Current > Unsure > Answered
                 if (idx === currentIndex) {
                     btn.classList.add('active');
                 } else if (unsureFlags[idx]) {
@@ -986,9 +1007,8 @@
                     btn.classList.add('answered');
                 }
 
-                // Prevent blocking by adding click listener directly
                 btn.addEventListener('click', (e) => {
-                    e.stopPropagation(); // Stop bubbling just in case
+                    e.stopPropagation();
                     jumpToQuestion(idx);
                 });
                 
@@ -1022,13 +1042,12 @@
                 choicesDiv.appendChild(btn);
             });
 
-            // Re-render sidebar to update highlights
             renderSidebar();
         }
 
         function selectAnswer(choiceIndex) {
+            saveExamState(); // บันทึกทุกครั้งที่ตอบ
             userAnswers[currentIndex] = choiceIndex;
-            // Note: We do NOT auto-advance to keep user in control
             renderQuestion(); 
         }
 
@@ -1038,6 +1057,7 @@
             } else {
                 unsureFlags[currentIndex] = true;
             }
+            saveExamState(); // บันทึกสถานะไม่แน่ใจ
             renderQuestion(); 
         }
 
@@ -1068,8 +1088,8 @@
         // 6. Calculate Results
         function finishQuiz() {
             clearInterval(timerInterval);
+            localStorage.removeItem(STORAGE_KEY); // ลบข้อมูลเมื่อส่งคำตอบ
             
-            // UI Switch
             document.getElementById('loading-overlay').style.display = 'flex';
             document.getElementById('loading-text').innerText = 'กำลังคำนวณคะแนน...';
 
@@ -1080,7 +1100,6 @@
                 document.getElementById('result-screen').classList.add('active');
 
                 let scores = { ethics: 0, general: 0, act: 0, code: 0 };
-                let maxScores = { ethics: 20, general: 40, act: 20, code: 20 };
 
                 currentQuestions.forEach((q, index) => {
                     if (userAnswers[index] === q.correctIndex) {
@@ -1091,13 +1110,10 @@
                 const totalKnowledge = scores.general + scores.act + scores.code;
                 
                 // Criteria
-                // Ethics: 70% of 20 = 14
-                // Knowledge: 60% of 80 = 48
                 const ethicsPass = scores.ethics >= 14; 
                 const knowledgePass = totalKnowledge >= 48; 
                 const isPassed = ethicsPass && knowledgePass;
 
-                // Display Scores
                 document.getElementById('score-ethics').innerText = scores.ethics;
                 
                 const ethStatus = document.getElementById('status-ethics');
@@ -1127,10 +1143,7 @@
 
         // 7. Save to Google Sheet
         function saveToGoogleSheet(ethicsScore, knowledgeScore, result) {
-            if (GOOGLE_SCRIPT_URL === 'YOUR_GOOGLE_SCRIPT_URL_HERE' || GOOGLE_SCRIPT_URL.length < 10) {
-                console.warn("ไม่ได้ระบุ Google Script URL");
-                return; 
-            }
+            if (GOOGLE_SCRIPT_URL.length < 10) return; 
             
             document.getElementById('loading-save').style.display = 'block';
             
@@ -1143,7 +1156,6 @@
                 result: result
             };
 
-            // Use fetch with no-cors to prevent blocking, but we won't get response content
             fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
@@ -1186,6 +1198,76 @@
                 list.appendChild(item);
             });
         }
-    </script>
+
+        // --- ระบบบันทึกกันเน็ตหลุด (Local Storage) ---
+        function saveExamState() {
+            if (!currentQuestions || currentQuestions.length === 0) return;
+            const state = {
+                userAnswers: userAnswers,
+                unsureFlags: unsureFlags,
+                currentIndex: currentIndex,
+                userInfo: userInfo,
+                timeLeft: timeLeft,
+                currentQuestions: currentQuestions,
+                timestamp: new Date().getTime()
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        }
+
+        function checkResumeExam() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                try {
+                    const state = JSON.parse(saved);
+                    if (new Date().getTime() - state.timestamp > 86400000) {
+                        localStorage.removeItem(STORAGE_KEY);
+                        return;
+                    }
+
+                    if (confirm('⚠️ พบข้อมูลการสอบที่ทำค้างไว้! \nต้องการกลับไปทำต่อจากเดิมหรือไม่?')) {
+                        userAnswers = state.userAnswers || {};
+                        unsureFlags = state.unsureFlags || {};
+                        currentIndex = state.currentIndex || 0;
+                        userInfo = state.userInfo || {};
+                        timeLeft = state.timeLeft || (2 * 60 * 60);
+                        currentQuestions = state.currentQuestions || [];
+
+                        document.getElementById('loading-overlay').style.display = 'none';
+                        document.getElementById('login-screen').classList.remove('active');
+                        document.getElementById('quiz-screen').classList.add('active');
+                        document.getElementById('quiz-sidebar').style.display = 'flex';
+
+                        startTimer();
+                        renderSidebar();
+                        renderQuestion();
+                    } else {
+                        localStorage.removeItem(STORAGE_KEY);
+                    }
+                } catch (e) {
+                    console.error("Resume Error", e);
+                    localStorage.removeItem(STORAGE_KEY);
+                }
+            }
+        }
+
+        // --- ฟังก์ชันปุ่มยกเลิก ---
+        function resetExam() {
+            if(confirm('ต้องการยกเลิกการสอบและกลับไปหน้าแรกใช่หรือไม่?\n(ข้อมูลที่ทำค้างไว้จะถูกลบทั้งหมด)')) {
+                localStorage.removeItem(STORAGE_KEY); 
+                location.reload(); 
+            }
+        }
+
+        // เริ่มเช็คทันที
+        checkResumeExam();
+
+    </script> 
+    
+    <div class="breaking-news-footer">
+        <div class="news-scroller">
+            📢 <strong>ประกาศด่วนจากทีมงาน:</strong> ระบบมีการอัปเดตข้อสอบชุดใหม่ (5 ม.ค. 2026) | ขอให้ทุกท่านกด Refresh หน้าจอก่อนทำข้อสอบ | หากพบปัญหาแจ้งไลน์กลุ่มทันทีครับ!
+        </div>
+    </div>
+
 </body>
 </html>
